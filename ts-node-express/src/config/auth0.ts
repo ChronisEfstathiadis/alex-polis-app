@@ -1,0 +1,21 @@
+import { auth } from "express-openid-connect";
+import dotenv from "dotenv";
+
+dotenv.config();
+
+export const auth0Config = {
+  authRequired: false,
+  auth0Logout: true,
+  secret: process.env.AUTH0_SECRET!,
+  baseURL: process.env.BASE_URL!,
+  clientID: process.env.AUTH0_CLIENT_ID!,
+  issuerBaseURL: process.env.AUTH0_ISSUER_BASE_URL!,
+  clientSecret: process.env.AUTH0_CLIENT_SECRET!,
+  authorizationParams: {
+    response_type: "code",
+    audience: process.env.AUTH0_AUDIENCE!,
+    scope: "openid profile email",
+  },
+};
+
+export const auth0Middleware = auth(auth0Config);
