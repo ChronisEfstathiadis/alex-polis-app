@@ -154,8 +154,6 @@ export const updateUser = async (req: Request, res: Response) => {
       .update(users)
       .set({
         name: name || existingUser.name,
-        picture: picture || existingUser.picture,
-        updatedAt: new Date(),
       })
       .where(eq(users.id, userId))
       .returning();

@@ -2,7 +2,6 @@ import { Request, Response, NextFunction } from "express";
 import jwt, { JwtHeader } from "jsonwebtoken";
 import jwksClient from "jwks-rsa";
 
-// JWKS client for JWT verification
 const client = jwksClient({
   jwksUri: `${process.env.AUTH0_ISSUER_BASE_URL}/.well-known/jwks.json`,
 });
@@ -21,7 +20,6 @@ function getKey(
   });
 }
 
-// Middleware to require authentication
 export const requireAuth = (
   req: Request,
   res: Response,
@@ -33,7 +31,6 @@ export const requireAuth = (
   next();
 };
 
-// Middleware to verify JWT token (for API routes)
 export const verifyToken = (
   req: Request,
   res: Response,
@@ -65,7 +62,6 @@ export const verifyToken = (
   );
 };
 
-// Optional: Middleware to attach user if authenticated
 export const optionalAuth = (
   req: Request,
   res: Response,

@@ -4,6 +4,7 @@ import { auth0Middleware } from "./config/auth0.js";
 import authRoutes from "./routes/auth.routes.js";
 import userRoutes from "./routes/user.routes.js";
 import { db } from "./config/database.js";
+import { autoSyncUser } from "./middlewares/syncUser.middleware.js";
 
 dotenv.config();
 
@@ -16,6 +17,9 @@ app.use(express.urlencoded({ extended: true }));
 
 // Auth0 middleware
 app.use(auth0Middleware);
+
+// Auto-sync user after Auth0 authentication
+app.use(autoSyncUser);
 
 // Routes
 app.use("/auth", authRoutes);
@@ -31,10 +35,50 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 // Protected dashboard route
-app.get("/dashboard", (req: Request, res: Response) => {
+app.get("/dashboard", async (req: Request, res: Response) => {
   if (!req.oidc.isAuthenticated()) {
     return res.redirect("/auth/login");
   }
+
+  // Auto-sync user to database
+  try {
+    req.user = req.oidc.user as any;
+    // Call syncUser logic inline or import and call it
+    const { db } = await import("./config/database.js");
+    const { users, insertUserSchema } = await import("./db/schema/user.js");
+    const { eq } = await import("drizzle-orm");
+
+    const { sub, email, name } = req.oidc.user as {
+      sub: string;
+      email: string;
+      name: string;
+    };
+    const validatedData = insertUserSchema.parse({
+      auth0Id: sub,
+      email: email,
+      name: name || null,
+      emailVerified: true,
+      lastLogin: new Date(),
+    });
+
+    const [existingUser] = await db
+      .select()
+      .from(users)
+      .where(eq(users.auth0Id, sub))
+      .limit(1);
+
+    if (existingUser) {
+      await db
+        .update(users)
+        .set({ lastLogin: new Date() })
+        .where(eq(users.auth0Id, sub));
+    } else {
+      await db.insert(users).values(validatedData);
+    }
+  } catch (error) {
+    console.error("Error syncing user:", error);
+  }
+
   res.json({
     message: "Welcome to your dashboard",
     user: req.oidc.user,
