@@ -5,23 +5,23 @@ import { eq } from "drizzle-orm";
 
 export const autoSyncUser = async (
   req: Request,
-  res: Response,
+  _res: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
   // Only sync if user is authenticated and we have user info
   if (req.oidc?.isAuthenticated() && req.oidc.user) {
     try {
-      const { sub, email, name, picture } = req.oidc.user;
+      const { sub, email, name } = req.oidc.user;
 
       if (!sub || !email) {
-        return next();
+        next();
+        return;
       }
 
       const validatedData = insertUserSchema.parse({
         auth0Id: sub,
         email: email,
         name: name || null,
-        picture: picture || null,
         emailVerified: true,
         lastLogin: new Date(),
       });

@@ -1,12 +1,16 @@
 import { db } from "../config/database.js";
 import { users, insertUserSchema } from "../db/schema/user.js";
-import { eq, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import type { Request, Response } from "express";
 
-export const getUserProfile = async (req: Request, res: Response) => {
+export const getUserProfile = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
     if (!req.user?.sub) {
-      return res.status(401).json({ error: "Unauthorized" });
+      res.status(401).json({ error: "Unauthorized" });
+      return;
     }
 
     const [user] = await db
@@ -16,7 +20,8 @@ export const getUserProfile = async (req: Request, res: Response) => {
       .limit(1);
 
     if (!user) {
-      return res.status(404).json({ error: "User not found" });
+      res.status(404).json({ error: "User not found" });
+      return;
     }
 
     res.json(user);
@@ -26,19 +31,19 @@ export const getUserProfile = async (req: Request, res: Response) => {
   }
 };
 
-export const syncUser = async (req: Request, res: Response) => {
+export const syncUser = async (req: Request, res: Response): Promise<void> => {
   try {
     if (!req.user) {
-      return res.status(401).json({ error: "Unauthorized" });
+      res.status(401).json({ error: "Unauthorized" });
+      return;
     }
 
-    const { sub, email, name, picture } = req.user;
+    const { sub, email, name } = req.user;
 
     const validatedData = insertUserSchema.parse({
       auth0Id: sub,
       email: email,
       name: name || null,
-      picture: picture || null,
       emailVerified: true,
       lastLogin: new Date(),
     });
@@ -56,7 +61,8 @@ export const syncUser = async (req: Request, res: Response) => {
         .where(eq(users.auth0Id, sub))
         .returning();
 
-      return res.json(updatedUser);
+      res.json(updatedUser);
+      return;
     }
 
     // Create new user
@@ -68,10 +74,11 @@ export const syncUser = async (req: Request, res: Response) => {
 
     // Handle Zod validation errors
     if (error instanceof Error && error.name === "ZodError") {
-      return res.status(400).json({
+      res.status(400).json({
         error: "Validation failed",
         details: error.message,
       });
+      return;
     }
 
     res.status(500).json({ error: "Internal server error" });
@@ -114,7 +121,10 @@ export const syncUser = async (req: Request, res: Response) => {
 //   }
 // };
 
-export const getUserById = async (req: Request, res: Response) => {
+export const getUserById = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
     const userId = parseInt(req.params.id || "0");
 
@@ -125,7 +135,8 @@ export const getUserById = async (req: Request, res: Response) => {
       .limit(1);
 
     if (!user) {
-      return res.status(404).json({ error: "User not found" });
+      res.status(404).json({ error: "User not found" });
+      return;
     }
 
     res.json(user);
@@ -135,10 +146,13 @@ export const getUserById = async (req: Request, res: Response) => {
   }
 };
 
-export const updateUser = async (req: Request, res: Response) => {
+export const updateUser = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
     const userId = parseInt(req.params.id || "0");
-    const { name, picture } = req.body;
+    const { name } = req.body;
 
     const [existingUser] = await db
       .select()
@@ -147,7 +161,8 @@ export const updateUser = async (req: Request, res: Response) => {
       .limit(1);
 
     if (!existingUser) {
-      return res.status(404).json({ error: "User not found" });
+      res.status(404).json({ error: "User not found" });
+      return;
     }
 
     const [updatedUser] = await db
@@ -165,7 +180,10 @@ export const updateUser = async (req: Request, res: Response) => {
   }
 };
 
-export const deleteUser = async (req: Request, res: Response) => {
+export const deleteUser = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
     const userId = parseInt(req.params.id || "0");
 
@@ -175,7 +193,8 @@ export const deleteUser = async (req: Request, res: Response) => {
       .returning();
 
     if (!deletedUser) {
-      return res.status(404).json({ error: "User not found" });
+      res.status(404).json({ error: "User not found" });
+      return;
     }
 
     res.json({ message: "User deleted successfully", user: deletedUser });

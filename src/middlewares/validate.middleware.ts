@@ -3,7 +3,11 @@ import type { ZodSchema, ZodIssue } from "zod";
 import type { Request, Response, NextFunction } from "express";
 
 export const validate = (schema: ZodSchema) => {
-  return async (req: Request, res: Response, next: NextFunction) => {
+  return async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     try {
       await schema.parseAsync({
         body: req.body,
@@ -18,13 +22,14 @@ export const validate = (schema: ZodSchema) => {
           message: issue.message,
         }));
 
-        return res.status(400).json({
+        res.status(400).json({
           error: "Validation failed",
           details: errorMessages,
         });
+        return;
       }
 
-      return res.status(500).json({
+      res.status(500).json({
         error: "Internal server error",
       });
     }

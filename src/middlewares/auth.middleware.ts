@@ -9,7 +9,7 @@ const client = jwksClient({
 function getKey(
   header: JwtHeader,
   callback: (err: Error | null, key: string | undefined) => void
-) {
+): void {
   client.getSigningKey(header.kid, (err, key) => {
     if (err) {
       callback(err, undefined);
@@ -24,9 +24,10 @@ export const requireAuth = (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): void => {
   if (!req.oidc?.isAuthenticated()) {
-    return res.status(401).json({ error: "Unauthorized" });
+    res.status(401).json({ error: "Unauthorized" });
+    return;
   }
   next();
 };
@@ -35,11 +36,12 @@ export const verifyToken = (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): void => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ error: "No token provided" });
+    res.status(401).json({ error: "No token provided" });
+    return;
   }
 
   const token = authHeader.substring(7);
@@ -54,7 +56,8 @@ export const verifyToken = (
     },
     (err, decoded) => {
       if (err) {
-        return res.status(401).json({ error: "Invalid token" });
+        res.status(401).json({ error: "Invalid token" });
+        return;
       }
       req.user = decoded as any;
       next();
@@ -64,9 +67,9 @@ export const verifyToken = (
 
 export const optionalAuth = (
   req: Request,
-  res: Response,
+  // res: Response,
   next: NextFunction
-) => {
+): void => {
   if (req.oidc?.isAuthenticated()) {
     req.user = req.oidc.user as any;
   }

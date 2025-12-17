@@ -26,7 +26,7 @@ app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
 
 // Public route
-app.get("/", (req: Request, res: Response) => {
+app.get("/", (req: Request, res: Response): void => {
   res.json({
     message: "Welcome to Alex Polis API",
     authenticated: req.oidc?.isAuthenticated() || false,
@@ -35,9 +35,10 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 // Protected dashboard route
-app.get("/dashboard", async (req: Request, res: Response) => {
+app.get("/dashboard", async (req: Request, res: Response): Promise<void> => {
   if (!req.oidc.isAuthenticated()) {
-    return res.redirect("/auth/login");
+    res.redirect("/auth/login");
+    return;
   }
 
   // Auto-sync user to database
@@ -86,7 +87,7 @@ app.get("/dashboard", async (req: Request, res: Response) => {
 });
 
 // Health check
-app.get("/health", async (req: Request, res: Response) => {
+app.get("/health", async (_req: Request, res: Response): Promise<void> => {
   try {
     await db.execute("SELECT 1");
     res.json({ status: "ok", database: "connected" });
