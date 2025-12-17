@@ -96,9 +96,11 @@ app.get("/health", async (_req: Request, res: Response): Promise<void> => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
-  console.log(`🔐 Auth0 login: http://localhost:${PORT}/auth/login`);
-});
+if (process.env.NODE_ENV !== "production") {
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running on http://localhost:${PORT}`);
+    console.log(`🔐 Auth0 login: http://localhost:${PORT}/auth/login`);
+  });
+}
 
 export default app;
