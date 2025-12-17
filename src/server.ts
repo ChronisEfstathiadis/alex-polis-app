@@ -100,3 +100,5 @@ app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
   console.log(`🔐 Auth0 login: http://localhost:${PORT}/auth/login`);
 });
+
+export default app;
