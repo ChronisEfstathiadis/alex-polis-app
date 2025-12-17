@@ -1,5 +1,5 @@
-import { db } from "../config/database.js";
-import { users, insertUserSchema } from "../db/schema/user.js";
+import { db } from "../config/database";
+import { users, insertUserSchema } from "../db/schema/user";
 import { eq } from "drizzle-orm";
 import type { Request, Response } from "express";
 

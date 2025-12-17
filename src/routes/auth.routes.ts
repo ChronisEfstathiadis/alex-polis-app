@@ -1,6 +1,6 @@
 import { Router } from "express";
 import type { Request, Response } from "express";
-import { syncUser } from "../controllers/user.controller.js";
+import { syncUser } from "../controllers/user.controller";
 
 const router = Router();
 
