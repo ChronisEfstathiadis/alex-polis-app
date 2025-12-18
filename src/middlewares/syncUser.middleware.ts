@@ -39,12 +39,12 @@ export const autoSyncUser = async (
           .set({ lastLogin: new Date() })
           .where(eq(users.auth0Id, sub));
       } else {
-        // Create new user
+        console.log("Auto-sync: Creating user...", email); // ADD LOG
         await db.insert(users).values(validatedData);
+        console.log("Auto-sync: Success!"); // ADD LOG
       }
     } catch (error) {
-      // Log error but don't block the request
-      console.error("Error auto-syncing user:", error);
+      console.error("Auto-sync CRITICAL Error:", error); // UPDATE LOG
     }
   }
   next();

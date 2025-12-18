@@ -77,10 +77,12 @@ app.get("/dashboard", async (req: Request, res: Response): Promise<void> => {
         .set({ lastLogin: new Date() })
         .where(eq(users.auth0Id, sub));
     } else {
-      await db.insert(users).values(validatedData);
+      console.log("Creating new user in DB:", validatedData.email); // ADD LOG
+      const result = await db.insert(users).values(validatedData).returning(); // ADD .returning()
+      console.log("User created successfully:", result[0].id); // ADD LOG
     }
   } catch (error) {
-    console.error("Error syncing user:", error);
+    console.error("CRITICAL: Error syncing user:", error); // UPDATE LOG
   }
 
   res.json({
