@@ -1,6 +1,8 @@
-import express, { Request, Response } from "express";
+import express, { Request, Response, Router } from "express";
 import dotenv from "dotenv";
 
+import swaggerUi from "swagger-ui-express";
+import { swaggerSpec } from "./config/swagger.js";
 // Update these imports to include .js
 import { auth0Middleware } from "./config/auth0.js";
 import authRoutes from "./routes/auth.routes.js";
@@ -10,6 +12,8 @@ import { autoSyncUser } from "./middlewares/syncUser.middleware.js";
 
 dotenv.config();
 // ... rest of the file
+
+const apiRoutes = Router();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -24,9 +28,14 @@ app.use(auth0Middleware);
 // Auto-sync user after Auth0 authentication
 app.use(autoSyncUser);
 
+// Swagger middleware
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 // Routes
 app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
+
+app.use("/api/v1", apiRoutes);
 
 // Public route
 app.get("/", (req: Request, res: Response): void => {
@@ -100,6 +109,8 @@ app.get("/health", async (_req: Request, res: Response): Promise<void> => {
     res.status(500).json({ status: "error", database: "disconnected" });
   }
 });
+
+// app.use("/v1/api", apiRoutes);
 
 if (process.env.NODE_ENV !== "production") {
   app.listen(PORT, () => {

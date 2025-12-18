@@ -1,3 +1,4 @@
+import { uuid } from "drizzle-orm/pg-core";
 import { db } from "../config/database.js";
 import { users, insertUserSchema } from "../db/schema/user.js";
 import { eq } from "drizzle-orm";
@@ -8,15 +9,19 @@ export const getUserProfile = async (
   res: Response
 ): Promise<void> => {
   try {
-    if (!req.user?.sub) {
-      res.status(401).json({ error: "Unauthorized" });
+    // 1. Get the ID from the URL parameters
+    const { id } = req.params;
+
+    if (!id) {
+      res.status(400).json({ error: "User ID is required" });
       return;
     }
 
+    // 2. Query the database using the ID
     const [user] = await db
       .select()
       .from(users)
-      .where(eq(users.auth0Id, req.user.sub))
+      .where(eq(users.id, id)) // 'id' here is the UUID from req.params
       .limit(1);
 
     if (!user) {
@@ -26,7 +31,7 @@ export const getUserProfile = async (
 
     res.json(user);
   } catch (error) {
-    console.error("Error fetching user:", error);
+    console.error("Error fetching user profile:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };
@@ -39,8 +44,9 @@ export const syncUser = async (req: Request, res: Response): Promise<void> => {
     }
 
     const { sub, email, name } = req.user;
-
+    const id = uuid().defaultRandom();
     const validatedData = insertUserSchema.parse({
+      id: id,
       auth0Id: sub,
       email: email,
       name: name || null,
