@@ -16,6 +16,7 @@ dotenv.config();
 const apiRoutes = Router();
 const CSS_URL =
   "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui.min.css";
+const SWAGGER_CDN = "https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.11.0";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -35,9 +36,14 @@ app.use(
   "/api-docs",
   swaggerUi.serve,
   swaggerUi.setup(swaggerSpec, {
-    customCss:
-      ".swagger-ui .opblock .opblock-summary-path-description-wrapper { align-items: center; display: flex; flex-wrap: wrap; gap: 0 10px; padding: 0 10px; width: 100%; }",
-    customCssUrl: CSS_URL,
+    // 2. Tell Swagger to load CSS and JS from the CDN
+    customCssUrl: `${SWAGGER_CDN}/swagger-ui.css`,
+    customJs: [
+      `${SWAGGER_CDN}/swagger-ui-bundle.js`,
+      `${SWAGGER_CDN}/swagger-ui-standalone-preset.js`,
+    ],
+    // 3. Optional: Add some custom CSS to fix layout issues on Vercel
+    customCss: ".swagger-ui .topbar { display: none }",
   })
 );
 

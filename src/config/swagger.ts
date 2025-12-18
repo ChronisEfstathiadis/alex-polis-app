@@ -1,6 +1,6 @@
 import swaggerJsdoc from "swagger-jsdoc";
 import packageJson from "../../package.json" with { type: "json" };
-
+import path from "path";
 const options: swaggerJsdoc.Options = {
   definition: {
     openapi: "3.0.0",
@@ -30,11 +30,10 @@ const options: swaggerJsdoc.Options = {
     },
   },
   apis: [
-    "./src/routes/*.ts",
-    "./dist/src/routes/*.js",
-    "./src/server.ts",
-    "./dist/src/server.js",
-  ], // Path to the API docs
+    path.join(process.cwd(), "src/routes/*.ts"),
+    path.join(process.cwd(), "dist/src/routes/*.js"), // Include compiled files
+    path.join(process.cwd(), "src/server.ts"),
+  ],
 };
 
 export const swaggerSpec = swaggerJsdoc(options);
