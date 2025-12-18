@@ -14,6 +14,8 @@ dotenv.config();
 // ... rest of the file
 
 const apiRoutes = Router();
+const CSS_URL =
+  "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui.min.css";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -29,7 +31,15 @@ app.use(auth0Middleware);
 app.use(autoSyncUser);
 
 // Swagger middleware
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use(
+  "/api-docs",
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerSpec, {
+    customCss:
+      ".swagger-ui .opblock .opblock-summary-path-description-wrapper { align-items: center; display: flex; flex-wrap: wrap; gap: 0 10px; padding: 0 10px; width: 100%; }",
+    customCssUrl: CSS_URL,
+  })
+);
 
 // Routes
 app.use("/auth", authRoutes);
