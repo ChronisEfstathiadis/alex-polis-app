@@ -126,12 +126,12 @@ export const getUserById = async (
   res: Response
 ): Promise<void> => {
   try {
-    const userId = parseInt(req.params.id || "0");
+    const userId = req.params.id || "0";
 
     const [user] = await db
       .select()
       .from(users)
-      .where(eq(users.id, userId))
+      .where(eq(users.id, userId.toString()))
       .limit(1);
 
     if (!user) {
@@ -151,13 +151,13 @@ export const updateUser = async (
   res: Response
 ): Promise<void> => {
   try {
-    const userId = parseInt(req.params.id || "0");
+    const userId = req.params.id || "0";
     const { name } = req.body;
 
     const [existingUser] = await db
       .select()
       .from(users)
-      .where(eq(users.id, userId))
+      .where(eq(users.id, userId.toString()))
       .limit(1);
 
     if (!existingUser) {
@@ -170,7 +170,7 @@ export const updateUser = async (
       .set({
         name: name || existingUser.name,
       })
-      .where(eq(users.id, userId))
+      .where(eq(users.id, userId.toString()))
       .returning();
 
     res.json(updatedUser);
@@ -185,11 +185,11 @@ export const deleteUser = async (
   res: Response
 ): Promise<void> => {
   try {
-    const userId = parseInt(req.params.id || "0");
+    const userId = req.params.id || "0";
 
     const [deletedUser] = await db
       .delete(users)
-      .where(eq(users.id, userId))
+      .where(eq(users.id, userId.toString()))
       .returning();
 
     if (!deletedUser) {

@@ -1,6 +1,6 @@
 import {
   pgTable,
-  uuid, // Import uuid
+  uuid,
   varchar,
   timestamp,
   boolean,
@@ -12,7 +12,7 @@ import { z } from "zod";
 export const users = pgTable("users", {
   // Change serial to uuid
   id: uuid("id").primaryKey().defaultRandom(),
-  auth0Id: varchar("auth0_id", { length: 255 }).notNull().unique(),
+  auth0Id: uuid("auth0_id").notNull().unique(),
   email: varchar("email", { length: 255 }).notNull().unique(),
   name: varchar("name", { length: 255 }),
   emailVerified: boolean("email_verified").default(false),
