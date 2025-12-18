@@ -6,26 +6,25 @@ const router = Router();
 
 /**
  * @openapi
- * /users/profile:
+ * /users/profile/{id}:  <-- ADD {id} HERE
  *   get:
- *     summary: Get the profile of a user by ID
- *     description: Returns the user data for the given ID
+ *     summary: Get user profile by ID
+ *     tags:
+ *       - Users
  *     parameters:
- *       - name: id
- *         in: path
- *         description: The ID of the user to get the profile of
+ *       - in: path
+ *         name: id
  *         required: true
  *         schema:
  *           type: string
- *     tags:
- *       - Users
+ *         description: The UUID of the user
  *     responses:
  *       200:
  *         description: Returns user data
- *       401:
- *         description: Unauthorized
+ *       404:
+ *         description: User not found
  */
-router.get("/profile/:id", requireAuth, getUserProfile);
+router.get("/profile/:id", requireAuth, getUserProfile); // <-- ADD :id HERE
 router.post("/sync", requireAuth, syncUser);
 
 // API routes (token-based)
