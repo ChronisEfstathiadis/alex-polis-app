@@ -11,7 +11,7 @@ export const auth0Config = {
   authRequired: false,
   auth0Logout: true,
   secret: process.env.AUTH0_SECRET, // guaranteed to be defined now
-  baseURL: process.env.BASE_URL, // convenient fallback for Vercel
+  baseURL: "https://alex-polis-app.vercel.app/",
   clientID: process.env.AUTH0_CLIENT_ID,
   issuerBaseURL: process.env.AUTH0_ISSUER_BASE_URL,
   clientSecret: process.env.AUTH0_CLIENT_SECRET,
