@@ -1,6 +1,6 @@
 import express, { Request, Response, Router } from "express";
 import dotenv from "dotenv";
-
+import cors from "cors";
 import swaggerUi from "swagger-ui-express";
 import { swaggerSpec } from "./config/swagger.js";
 // Update these imports to include .js
@@ -14,13 +14,12 @@ dotenv.config();
 // ... rest of the file
 
 const apiRoutes = Router();
-const CSS_URL =
-  "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui.min.css";
 const SWAGGER_CDN = "https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.11.0";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+app.use(cors());
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
