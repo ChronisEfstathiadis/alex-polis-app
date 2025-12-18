@@ -1,12 +1,15 @@
 import express, { Request, Response } from "express";
 import dotenv from "dotenv";
-import { auth0Middleware } from "./config/auth0";
-import authRoutes from "./routes/auth.routes";
-import userRoutes from "./routes/user.routes";
-import { db } from "./config/database";
-import { autoSyncUser } from "./middlewares/syncUser.middleware";
+
+// Update these imports to include .js
+import { auth0Middleware } from "./config/auth0.js";
+import authRoutes from "./routes/auth.routes.js";
+import userRoutes from "./routes/user.routes.js";
+import { db } from "./config/database.js";
+import { autoSyncUser } from "./middlewares/syncUser.middleware.js";
 
 dotenv.config();
+// ... rest of the file
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -45,8 +48,8 @@ app.get("/dashboard", async (req: Request, res: Response): Promise<void> => {
   try {
     req.user = req.oidc.user as any;
     // Call syncUser logic inline or import and call it
-    const { db } = await import("./config/database");
-    const { users, insertUserSchema } = await import("./db/schema/user");
+    const { db } = await import("./config/database.js");
+    const { users, insertUserSchema } = await import("./db/schema/user.js");
     const { eq } = await import("drizzle-orm");
 
     const { sub, email, name } = req.oidc.user as {
