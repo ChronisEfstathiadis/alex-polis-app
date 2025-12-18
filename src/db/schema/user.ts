@@ -1,15 +1,17 @@
 import {
   pgTable,
-  serial,
+  uuid, // Import uuid
   varchar,
   timestamp,
   boolean,
 } from "drizzle-orm/pg-core";
+// import { sql } from "drizzle-orm";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
 export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
+  // Change serial to uuid
+  id: uuid("id").primaryKey().defaultRandom(),
   auth0Id: varchar("auth0_id", { length: 255 }).notNull().unique(),
   email: varchar("email", { length: 255 }).notNull().unique(),
   name: varchar("name", { length: 255 }),
