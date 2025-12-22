@@ -1,0 +1,36 @@
+{
+  "name": "alex-polis-app",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node server.js",
+    "db:push": "drizzle-kit push",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ChronisEfstathiadis/alex-polis-app.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ChronisEfstathiadis/alex-polis-app/issues"
+  },
+  "homepage": "https://github.com/ChronisEfstathiadis/alex-polis-app#readme",
+  "dependencies": {
+    "@clerk/express": "^1.7.60",
+    "dotenv": "^17.2.3",
+    "drizzle-orm": "^0.45.1",
+    "express": "^5.2.1",
+    "pg": "^8.16.3",
+    "svix": "^1.82.0"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.31.8"
+  }
+}
