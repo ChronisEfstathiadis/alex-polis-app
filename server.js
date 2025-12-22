@@ -21,7 +21,6 @@ app.post(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Initialize Clerk middleware
 app.use(clerkMiddleware());
 
 app.get("/protected", requireAuth(), async (req, res) => {
@@ -31,13 +30,11 @@ app.get("/protected", requireAuth(), async (req, res) => {
   try {
     user = await clerkClient.users.getUser(userId);
 
-    // 1. Check if user exists in your DB
     const existingUser = await db
       .select()
       .from(users)
       .where(eq(users.id, userId));
 
-    // 2. If not, create them
     if (existingUser.length === 0) {
       await db.insert(users).values({
         id: userId,
