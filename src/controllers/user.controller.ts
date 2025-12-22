@@ -1,6 +1,5 @@
-import { uuid } from "drizzle-orm/pg-core";
 import { db } from "../config/database.js";
-import { users, insertUserSchema } from "../db/schema/user.js";
+import { insertUserSchema, users } from "../db/schema/user.js";
 import { eq } from "drizzle-orm";
 import type { Request, Response } from "express";
 
@@ -9,29 +8,24 @@ export const getUserProfile = async (
   res: Response
 ): Promise<void> => {
   try {
-    // 1. Get the ID from the URL parameters
-    const { id } = req.params;
-
-    if (!id) {
-      res.status(400).json({ error: "User ID is required" });
-      return;
-    }
-
-    // 2. Query the database using the ID
+    const userId = req.user?.id;
+    console.log("userId", userId);
     const [user] = await db
       .select()
       .from(users)
-      .where(eq(users.id, id)) // 'id' here is the UUID from req.params
+      .where(eq(users.id, userId))
       .limit(1);
 
     if (!user) {
-      res.status(404).json({ error: "User not found" });
+      res.status(404).json({
+        error: "User not found",
+        requestedId: userId,
+      });
       return;
     }
-
     res.json(user);
   } catch (error) {
-    console.error("Error fetching user profile:", error);
+    console.error("Database Query Error:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };
@@ -44,41 +38,38 @@ export const syncUser = async (req: Request, res: Response): Promise<void> => {
     }
 
     const { sub, email, name } = req.user;
-    const id = uuid().defaultRandom();
     const validatedData = insertUserSchema.parse({
-      id: id,
-      auth0Id: sub,
+      id: sub,
       email: email,
-      name: name || null,
-      emailVerified: true,
-      lastLogin: new Date(),
+      username: name || null,
+      imageUrl: null,
+      role: "user",
+      createdAt: new Date(),
     });
 
     const [existingUser] = await db
       .select()
       .from(users)
-      .where(eq(users.auth0Id, sub))
+      .where(eq(users.id, sub))
       .limit(1);
 
     if (existingUser) {
       const [updatedUser] = await db
         .update(users)
-        .set({ lastLogin: new Date() })
-        .where(eq(users.auth0Id, sub))
+        .set({ username: name || null, imageUrl: null, role: "user" })
+        .where(eq(users.id, sub))
         .returning();
 
       res.json(updatedUser);
       return;
     }
 
-    // Create new user
     const [newUser] = await db.insert(users).values(validatedData).returning();
 
     res.status(201).json(newUser);
   } catch (error) {
     console.error("Error syncing user:", error);
 
-    // Handle Zod validation errors
     if (error instanceof Error && error.name === "ZodError") {
       res.status(400).json({
         error: "Validation failed",
@@ -173,9 +164,7 @@ export const updateUser = async (
 
     const [updatedUser] = await db
       .update(users)
-      .set({
-        name: name || existingUser.name,
-      })
+      .set({ username: name || null, imageUrl: null, role: "user" })
       .where(eq(users.id, userId.toString()))
       .returning();
 
@@ -186,6 +175,7 @@ export const updateUser = async (
   }
 };
 
+// ADD THIS FUNCTION:
 export const deleteUser = async (
   req: Request,
   res: Response

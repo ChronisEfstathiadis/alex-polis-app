@@ -1,35 +1,42 @@
 import { Router } from "express";
-import { getUserProfile, syncUser } from "../controllers/user.controller.js";
-import { requireAuth, verifyToken } from "../middlewares/auth.middleware.js";
+import { getUserById, deleteUser } from "../controllers/user.controller.js";
 
 const router = Router();
 
 /**
  * @openapi
- * /users/profile/{id}:
+ * /api/users/{id}:
  *   get:
- *     summary: Get user profile by ID
- *     tags:
- *       - Users
+ *     summary: Get user by ID
+ *     tags: [Users]
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
  *         schema:
  *           type: string
- *         description: The UUID of the user
  *     responses:
  *       200:
- *         description: Returns user data
- *       401:
- *         description: Unauthorized
- *       404:
- *         description: User not found
+ *         description: Success
  */
-router.get("/profile/:id", requireAuth, getUserProfile);
-router.post("/sync", requireAuth, syncUser);
+router.get("/:id", getUserById);
 
-// API routes (token-based)
-router.get("/api/profile", verifyToken, getUserProfile);
+/**
+ * @openapi
+ * /api/users/{id}:
+ *   delete:
+ *     summary: Delete a user
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Success
+ */
+router.delete("/:id", deleteUser);
 
 export default router;

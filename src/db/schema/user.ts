@@ -1,32 +1,15 @@
-import {
-  pgTable,
-  uuid,
-  varchar,
-  timestamp,
-  boolean,
-} from "drizzle-orm/pg-core";
-// import { sql } from "drizzle-orm";
+import { pgTable, varchar, text, timestamp } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-import { z } from "zod";
 
 export const users = pgTable("users", {
-  // Change serial to uuid
-  id: uuid("id").primaryKey().defaultRandom(),
-  auth0Id: uuid("auth0_id").notNull().unique(),
+  // Clerk ID is a string, so we use varchar instead of uuid
+  id: varchar("id", { length: 255 }).primaryKey(),
   email: varchar("email", { length: 255 }).notNull().unique(),
-  name: varchar("name", { length: 255 }),
-  emailVerified: boolean("email_verified").default(false),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  lastLogin: timestamp("last_login"),
+  username: varchar("username", { length: 255 }),
+  imageUrl: text("image_url"),
+  role: varchar("role", { length: 50 }).notNull().default("user"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
-// Drizzle-Zod integration
-export const insertUserSchema = createInsertSchema(users, {
-  email: z.string().email("Invalid email format"),
-  name: z.string().min(2).optional(),
-  auth0Id: z.string().min(1, "Auth0 ID is required"),
-});
-
+export const insertUserSchema = createInsertSchema(users);
 export const selectUserSchema = createSelectSchema(users);
-
-export {};

@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 export default defineConfig({
-  schema: "./src/db/schema/user.ts", // Προσοχή: Σιγουρέψου ότι υπάρχει αυτό το μονοπάτι
+  schema: "./src/db/schema/*.ts", // Προσοχή: Σιγουρέψου ότι υπάρχει αυτό το μονοπάτι
   out: "./drizzle/migrations",
   dialect: "postgresql",
   dbCredentials: {
