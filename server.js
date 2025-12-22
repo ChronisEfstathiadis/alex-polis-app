@@ -24,6 +24,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(clerkMiddleware());
 
 app.get("/protected", requireAuth(), async (req, res) => {
+  console.log("Protected route accessed");
   const { userId } = req.auth;
   let user;
 
@@ -38,7 +39,7 @@ app.get("/protected", requireAuth(), async (req, res) => {
     if (existingUser.length === 0) {
       await db.insert(users).values({
         id: userId,
-        name: `${user.firstName} ${user.lastName}`,
+        username: `${user.username}`,
         email: user.emailAddresses[0].emailAddress,
       });
       console.log("User synced to DB");
