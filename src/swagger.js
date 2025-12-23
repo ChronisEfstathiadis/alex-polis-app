@@ -22,26 +22,22 @@ const options = {
     ],
     components: {
       securitySchemes: {
+        // Define both schemes, but we will choose which one to use below
         bearerAuth: {
           type: "http",
           scheme: "bearer",
           bearerFormat: "JWT",
         },
-        // Only add TestUserAuth if NOT in production
-        ...(!isProduction && {
-          TestUserAuth: {
-            type: "apiKey",
-            in: "header",
-            name: "x-test-user",
-            description: "Enter User ID directly for testing (Dev only)",
-          },
-        }),
+        TestUserAuth: {
+          type: "apiKey",
+          in: "header",
+          name: "x-test-user",
+          description: "Enter User ID directly for testing (Dev only)",
+        },
       },
     },
-    // Only allow TestUserAuth if NOT in production
-    security: isProduction
-      ? [{ bearerAuth: [] }]
-      : [{ bearerAuth: [] }, { TestUserAuth: [] }],
+    // LOGIC: If production -> use bearerAuth. If dev -> use TestUserAuth.
+    security: isProduction ? [{ bearerAuth: [] }] : [{ TestUserAuth: [] }],
   },
   apis: ["./src/routes/*.js", "./server.js"],
 };

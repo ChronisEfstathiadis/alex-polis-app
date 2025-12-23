@@ -13,6 +13,7 @@ const router = Router();
  *     tags: [Users]
  *     security:
  *       - bearerAuth: []
+ *       - TestUserAuth: []
  *     parameters:
  *       - in: path
  *         name: userId
