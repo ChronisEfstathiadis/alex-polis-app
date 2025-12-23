@@ -1,5 +1,6 @@
 import "dotenv/config";
 import express from "express";
+import cors from "cors";
 import { clerkClient, requireAuth, clerkMiddleware } from "@clerk/express";
 import * as dotenv from "dotenv";
 import { db } from "./src/db.js";
@@ -14,6 +15,8 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+app.use(cors());
 
 app.post(
   "/api/webhooks/clerk",

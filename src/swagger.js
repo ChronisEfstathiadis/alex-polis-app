@@ -1,5 +1,7 @@
 import swaggerJsdoc from "swagger-jsdoc";
 
+const isProduction = process.env.NODE_ENV === "production";
+
 const options = {
   definition: {
     openapi: "3.0.0",
@@ -25,8 +27,21 @@ const options = {
           scheme: "bearer",
           bearerFormat: "JWT",
         },
+        // Only add TestUserAuth if NOT in production
+        ...(!isProduction && {
+          TestUserAuth: {
+            type: "apiKey",
+            in: "header",
+            name: "x-test-user",
+            description: "Enter User ID directly for testing (Dev only)",
+          },
+        }),
       },
     },
+    // Only allow TestUserAuth if NOT in production
+    security: isProduction
+      ? [{ bearerAuth: [] }]
+      : [{ bearerAuth: [] }, { TestUserAuth: [] }],
   },
   apis: ["./src/routes/*.js", "./server.js"],
 };

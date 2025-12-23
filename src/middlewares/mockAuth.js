@@ -9,8 +9,8 @@ export const requireAuthDev = () => {
     if (req.headers.authorization) {
       return requireAuth()(req, res, next);
     }
+    const testUser = req.headers["x-test-user"];
 
-    const testUser = req.headers["user_37D1I571zxExEKOYRfrgtRGh9uH"];
     if (testUser) {
       req.auth = { userId: testUser };
       return next();
