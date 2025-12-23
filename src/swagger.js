@@ -24,18 +24,9 @@ const options = {
               description: "Local Development Server",
             },
           ]),
-      //   {
-      //     url: "https://alex-polis-app.vercel.app/api",
-      //     description: "Production Server",
-      //   },
-      //   {
-      //     url: "http://localhost:3000/api",
-      //     description: "Local Development Server",
-      //   },
     ],
     components: {
       securitySchemes: {
-        // Only add TestUserAuth if NOT in production
         ...(!isProduction
           ? {
               TestUserAuth: {
@@ -54,7 +45,6 @@ const options = {
             }),
       },
     },
-    // Only allow TestUserAuth if NOT in production
     security: isProduction ? [{ bearerAuth: [] }] : [{ TestUserAuth: [] }],
   },
   apis: ["./src/routes/*.js", "./server.js"],
