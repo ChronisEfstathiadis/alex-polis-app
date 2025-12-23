@@ -10,13 +10,13 @@ const options = {
     },
     servers: [
       {
+        url: "https://alex-polis-app.vercel.app/api",
+        description: "Production Server",
+      },
+      {
         url: "http://localhost:3000/api",
         description: "Local Development Server",
       },
-      //   {
-      //     url: "https://api.alexpolis.com",
-      //     description: "Production Server",
-      //   },
     ],
     components: {
       securitySchemes: {

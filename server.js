@@ -55,7 +55,22 @@ app.get("/protected", requireAuth(), async (req, res) => {
   }
 });
 
-app.use("/swagger", swaggerUi.serve, swaggerUi.setup(specs));
+// Change this line:
+// app.use("/swagger", swaggerUi.serve, swaggerUi.setup(specs));
+
+// To this:
+app.use(
+  "/swagger",
+  swaggerUi.serve,
+  swaggerUi.setup(specs, {
+    customCssUrl:
+      "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui.min.css",
+    customJs: [
+      "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-bundle.js",
+      "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-standalone-preset.js",
+    ],
+  })
+);
 
 app.use("/api", usersRoutes);
 
