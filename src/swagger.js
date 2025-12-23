@@ -11,14 +11,27 @@ const options = {
       description: "API Documentation for Alex Polis App",
     },
     servers: [
-      {
-        url: "https://alex-polis-app.vercel.app/api",
-        description: "Production Server",
-      },
-      {
-        url: "http://localhost:3000/api",
-        description: "Local Development Server",
-      },
+      ...(isProduction
+        ? [
+            {
+              url: "https://alex-polis-app.vercel.app/api",
+              description: "Production Server",
+            },
+          ]
+        : [
+            {
+              url: "http://localhost:3000/api",
+              description: "Local Development Server",
+            },
+          ]),
+      //   {
+      //     url: "https://alex-polis-app.vercel.app/api",
+      //     description: "Production Server",
+      //   },
+      //   {
+      //     url: "http://localhost:3000/api",
+      //     description: "Local Development Server",
+      //   },
     ],
     components: {
       securitySchemes: {
