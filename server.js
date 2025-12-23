@@ -5,7 +5,10 @@ import * as dotenv from "dotenv";
 import { db } from "./src/db.js";
 import { users } from "./src/models/users.js";
 import { eq } from "drizzle-orm";
-import { handleClerkWebhook } from "./src/api/webHook.js";
+import { handleClerkWebhook } from "./src/webHooks/clerk.js";
+import usersRoutes from "./src/routes/users.route.js";
+import { specs } from "./src/swagger.js";
+import swaggerUi from "swagger-ui-express";
 
 dotenv.config();
 
@@ -51,6 +54,10 @@ app.get("/protected", requireAuth(), async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+app.use("/swagger", swaggerUi.serve, swaggerUi.setup(specs));
+
+app.use("/api", usersRoutes);
 
 app.get("/", (req, res) => {
   res.send("Homepage - <a href='/protected'>Go to Protected Route</a>");
