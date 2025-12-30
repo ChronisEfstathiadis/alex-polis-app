@@ -2,14 +2,11 @@ import { db } from "../db.js";
 import { events } from "../models/events.js";
 import { eq } from "drizzle-orm";
 
-// Helper function to parse dd/mm/yyyy
 const parseDate = (dateStr) => {
   const [day, month, year] = dateStr.split("/");
-  // Note: Month is 0-indexed in JS Date (0 = January, 11 = December)
   return new Date(year, month - 1, day);
 };
 
-// Helper function to validate dd/mm/yyyy format
 const isValidDateFormat = (dateStr) => {
   const regex = /^\d{2}\/\d{2}\/\d{4}$/;
   return regex.test(dateStr);
@@ -68,7 +65,6 @@ export const getEventById = async (req, res) => {
 export const createEvent = async (req, res) => {
   const { userId } = req.auth;
 
-  // 1. Get dates from the frontend (request body)
   const {
     title,
     description,
@@ -154,19 +150,9 @@ export const createEvent = async (req, res) => {
         .status(400)
         .json({ error: "Image URL must not contain spaces" });
     }
-    // if (image_url.includes("http://") || image_url.includes("https://")) {
-    //   return res
-    //     .status(400)
-    //     .json({ error: "Image URL must not contain http or https" });
-    // }
     if (image_url.includes("www.")) {
       return res.status(400).json({ error: "Image URL must not contain www." });
     }
-    // if (image_url.includes(".")) {
-    //   return res
-    //     .status(400)
-    //     .json({ error: "Image URL must contain a valid domain" });
-    // }
     res.status(500).json({ error: error.message });
   }
 };
@@ -190,7 +176,6 @@ export const deleteEvent = async (req, res) => {
 export const updateEvent = async (req, res) => {
   const { eventId } = req.params;
 
-  // Debug log
   console.log("Update Body:", req.body);
   console.log("Content-Type:", req.headers["content-type"]);
 
@@ -209,7 +194,6 @@ export const updateEvent = async (req, res) => {
     category,
   } = req.body;
 
-  // Validate date format if provided
   if (start_date && !isValidDateFormat(start_date)) {
     return res
       .status(400)
@@ -232,14 +216,11 @@ export const updateEvent = async (req, res) => {
 
     if (start_date) {
       updateData.start_date = parseDate(start_date);
-      updateData.start_time = parseDate(start_date); // Sync start_time
+      updateData.start_time = parseDate(start_date);
     }
     if (end_date) {
       updateData.end_date = parseDate(end_date);
     }
-    // If specific start_time logic is needed separate from start_date, handle it here
-    // checking if start_time is passed as a separate field or derived from start_date
-
     const event = await db
       .update(events)
       .set(updateData)
@@ -284,19 +265,9 @@ export const updateEvent = async (req, res) => {
         .status(400)
         .json({ error: "Image URL must not contain spaces" });
     }
-    // if (image_url.includes("http://") || image_url.includes("https://")) {
-    //   return res
-    //     .status(400)
-    //     .json({ error: "Image URL must not contain http or https" });
-    // }
     if (image_url.includes("www.")) {
       return res.status(400).json({ error: "Image URL must not contain www." });
     }
-    // if (image_url.includes(".")) {
-    //   return res
-    //     .status(400)
-    //     .json({ error: "Image URL must contain a valid domain" });
-    // }
     res.status(500).json({ error: error.message });
   }
 };
