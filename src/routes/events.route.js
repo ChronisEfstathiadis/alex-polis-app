@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {
+  getAllEvents,
   getEventsByUserId,
   getEventById,
   createEvent,
@@ -12,7 +13,44 @@ const router = Router();
 
 /**
  * @swagger
- * /events/getEventsByUserId/{userId}:
+ * /events/get-all-events:
+ *   get:
+ *     summary: Get all events
+ *     tags: [Events]
+ *     security:
+ *       - bearerAuth: []
+ *       - TestUserAuth: []
+ *     responses:
+ *       200:
+ *         description: The events description
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                   title:
+ *                     type: string
+ *                   description:
+ *                     type: string
+ *                   start_date:
+ *                     type: string
+ *                   end_date:
+ *                     type: string
+ *                   location:
+ *                     type: string
+ *                   image_url:
+ *                     type: string
+ *                   category:
+ *                     type: string
+ *       404:
+ *         description: Events not found
+ *       500:
+ *         description: Failed to get events
+ * /events/get-events-by-user-id/{userId}:
  *   get:
  *     summary: Get events by user ID
  *     tags: [Events]
@@ -58,7 +96,7 @@ const router = Router();
  *         description: Invalid user ID
  *       500:
  *         description: Failed to get events
- * /events/getEventById/{eventId}:
+ * /events/get-event-by-id/{eventId}:
  *   get:
  *     summary: Get event by ID
  *     tags: [Events]
@@ -102,7 +140,7 @@ const router = Router();
  *         description: Invalid event ID
  *       500:
  *         description: Failed to get event
- * /events/createEvent:
+ * /events/create-event:
  *   post:
  *     summary: Create event
  *     tags: [Events]
@@ -148,7 +186,7 @@ const router = Router();
  *         description: Invalid event ID
  *       500:
  *         description: Failed to create event
- * /events/deleteEvent/{eventId}:
+ * /events/delete-event/{eventId}:
  *   delete:
  *     summary: Delete event
  *     tags: [Events]
@@ -180,7 +218,7 @@ const router = Router();
  *         description: Invalid event ID
  *       500:
  *         description: Failed to delete event
- * /events/updateEvent/{eventId}:
+ * /events/update-event/{eventId}:
  *   put:
  *     summary: Update event
  *     tags: [Events]
@@ -235,12 +273,13 @@ const router = Router();
  *         description: Failed to update event
  */
 router.get(
-  "/events/getEventsByUserId/:userId",
+  "/events/get-events-by-user-id/:userId",
   requireAuthDev(),
   getEventsByUserId
 );
-router.get("/events/getEventById/:eventId", requireAuthDev(), getEventById);
-router.post("/events/createEvent", requireAuthDev(), createEvent);
-router.delete("/events/deleteEvent/:eventId", requireAuthDev(), deleteEvent);
-router.put("/events/updateEvent/:eventId", requireAuthDev(), updateEvent);
+router.get("/events/get-all-events", requireAuthDev(), getAllEvents);
+router.get("/events/get-event-by-id/:eventId", requireAuthDev(), getEventById);
+router.post("/events/create-event", requireAuthDev(), createEvent);
+router.delete("/events/delete-event/:eventId", requireAuthDev(), deleteEvent);
+router.put("/events/update-event/:eventId", requireAuthDev(), updateEvent);
 export default router;

@@ -2,6 +2,31 @@ import { db } from "../db.js";
 import { events } from "../models/events.js";
 import { eq } from "drizzle-orm";
 
+// Helper function to parse dd/mm/yyyy
+const parseDate = (dateStr) => {
+  const [day, month, year] = dateStr.split("/");
+  // Note: Month is 0-indexed in JS Date (0 = January, 11 = December)
+  return new Date(year, month - 1, day);
+};
+
+// Helper function to validate dd/mm/yyyy format
+const isValidDateFormat = (dateStr) => {
+  const regex = /^\d{2}\/\d{2}\/\d{4}$/;
+  return regex.test(dateStr);
+};
+
+export const getAllEvents = async (req, res) => {
+  try {
+    const events = await db.select().from(events);
+    res.json(events);
+  } catch (error) {
+    if (events.length === 0) {
+      return res.status(404).json({ error: "Events not found" });
+    }
+    res.status(500).json({ error: error.message });
+  }
+};
+
 export const getEventsByUserId = async (req, res) => {
   const { userId } = req.params;
   try {
@@ -43,14 +68,41 @@ export const getEventById = async (req, res) => {
 export const createEvent = async (req, res) => {
   const { userId } = req.auth;
 
-  const { title, description, location, image_url, category } = req.body;
-
-  // Defaults: Start now, end in 2 hours
-  const start_date = new Date();
-  const end_date = new Date(new Date().getTime() + 2 * 60 * 60 * 1000);
+  // 1. Get dates from the frontend (request body)
+  const {
+    title,
+    description,
+    location,
+    image_url,
+    category,
+    start_date,
+    end_date,
+  } = req.body;
 
   if (!userId) {
     return res.status(401).json({ error: "Unauthorized: User not found" });
+  }
+
+  if (!isValidDateFormat(start_date) || !isValidDateFormat(end_date)) {
+    return res.status(400).json({
+      error:
+        "Invalid date format. Please use dd/mm/yyyy format (e.g., 25/12/2023)",
+    });
+  }
+
+  const startDateObj = parseDate(start_date);
+  const endDateObj = parseDate(end_date);
+
+  if (isNaN(startDateObj.getTime()) || isNaN(endDateObj.getTime())) {
+    return res.status(400).json({
+      error: "Invalid date values provided",
+    });
+  }
+
+  if (startDateObj > endDateObj) {
+    return res
+      .status(400)
+      .json({ error: "Start date must be before end date" });
   }
 
   try {
@@ -58,8 +110,9 @@ export const createEvent = async (req, res) => {
       user_id: userId,
       title,
       description,
-      start_date,
-      end_date,
+      start_date: startDateObj,
+      end_date: endDateObj,
+      start_time: startDateObj,
       location,
       image_url,
       category,
@@ -150,26 +203,50 @@ export const updateEvent = async (req, res) => {
     description,
     start_date,
     end_date,
+    start_time,
     location,
     image_url,
     category,
   } = req.body;
+
+  // Validate date format if provided
+  if (start_date && !isValidDateFormat(start_date)) {
+    return res
+      .status(400)
+      .json({ error: "Invalid start_date format. Use dd/mm/yyyy" });
+  }
+  if (end_date && !isValidDateFormat(end_date)) {
+    return res
+      .status(400)
+      .json({ error: "Invalid end_date format. Use dd/mm/yyyy" });
+  }
+
   try {
+    const updateData = {
+      title,
+      description,
+      location,
+      image_url,
+      category,
+    };
+
+    if (start_date) {
+      updateData.start_date = parseDate(start_date);
+      updateData.start_time = parseDate(start_date); // Sync start_time
+    }
+    if (end_date) {
+      updateData.end_date = parseDate(end_date);
+    }
+    // If specific start_time logic is needed separate from start_date, handle it here
+    // checking if start_time is passed as a separate field or derived from start_date
+
     const event = await db
       .update(events)
-      .set({
-        title,
-        description,
-        start_date: new Date(start_date), // Convert string to Date
-        end_date: new Date(end_date), // Convert string to Date
-        location,
-        image_url,
-        category,
-      })
+      .set(updateData)
       .where(eq(events.id, eventId));
     res.json(event);
   } catch (error) {
-    if (title.length > 100 || title.length < 3) {
+    if (title && (title.length > 100 || title.length < 3)) {
       return res
         .status(400)
         .json({ error: "Title must be between 3 and 100 characters" });
@@ -194,17 +271,12 @@ export const updateEvent = async (req, res) => {
         .status(400)
         .json({ error: "Image URL must be between 10 and 200 characters" });
     }
-    if (start_date > end_date) {
-      return res
-        .status(400)
-        .json({ error: "Start date must be before end date" });
-    }
-    if (start_date < new Date()) {
+    if (start_date && start_date < new Date()) {
       return res
         .status(400)
         .json({ error: "Start date must be in the future" });
     }
-    if (end_date < new Date()) {
+    if (end_date && end_date < new Date()) {
       return res.status(400).json({ error: "End date must be in the future" });
     }
     if (image_url.includes(" ")) {
