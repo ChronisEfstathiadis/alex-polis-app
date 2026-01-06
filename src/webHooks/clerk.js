@@ -46,6 +46,7 @@ export const handleClerkWebhook = async (req, res) => {
         email,
         username: username,
         imageUrl: image_url,
+        role: "user",
       };
 
       await db.insert(users).values(userData).onConflictDoUpdate({
