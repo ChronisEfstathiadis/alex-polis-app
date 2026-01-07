@@ -1,7 +1,7 @@
 import { pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { randomUUID } from "crypto";
 
-export const places = pgTable("places", {
+export const PointsOfInterest = pgTable("points_of_interest", {
   id: text("id")
     .primaryKey()
     .$defaultFn(() => randomUUID()),

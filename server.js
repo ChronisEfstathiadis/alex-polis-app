@@ -11,7 +11,7 @@ import { specs } from "./src/swagger.js";
 import swaggerUi from "swagger-ui-express";
 import usersRoutes from "./src/routes/users.route.js";
 import eventsRoutes from "./src/routes/events.route.js";
-import placesRoutes from "./src/routes/places.route.js";
+import pointsOfInterestRoutes from "./src/routes/pointsOfInterest.route.js";
 
 dotenv.config();
 
@@ -79,7 +79,7 @@ app.use(
 
 app.use("/api", usersRoutes);
 app.use("/api", eventsRoutes);
-app.use("/api", placesRoutes);
+app.use("/api", pointsOfInterestRoutes);
 app.get("/", (req, res) => {
   res.send("Homepage - <a href='/protected'>Go to Protected Route</a>");
 });
