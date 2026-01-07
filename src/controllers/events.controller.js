@@ -14,10 +14,10 @@ const isValidDateFormat = (dateStr) => {
 
 export const getAllEvents = async (req, res) => {
   try {
-    const events = await db.select().from(events);
-    res.json(events);
+    const allEvents = await db.select().from(events);
+    res.json(allEvents);
   } catch (error) {
-    if (events.length === 0) {
+    if (allEvents.length === 0) {
       return res.status(404).json({ error: "Events not found" });
     }
     res.status(500).json({ error: error.message });
@@ -27,16 +27,16 @@ export const getAllEvents = async (req, res) => {
 export const getEventsByUserId = async (req, res) => {
   const { userId } = req.params;
   try {
-    const events = await db
+    const userEvents = await db
       .select()
       .from(events)
       .where(eq(events.user_id, userId));
-    res.json(events);
+    res.json(userEvents);
   } catch (error) {
     if (userId.length === 0) {
       return res.status(404).json({ error: "User not found" });
     }
-    if (events.length === 0) {
+    if (userEvents.length === 0) {
       return res.status(404).json({ error: "Events not found" });
     }
     if (!userId) {
@@ -49,8 +49,12 @@ export const getEventsByUserId = async (req, res) => {
 export const getEventById = async (req, res) => {
   const { eventId } = req.params;
   try {
-    const event = await db.select().from(events).where(eq(events.id, eventId));
-    res.json(event);
+    const eventById = await db
+      .select()
+      .from(events)
+      .where(eq(events.id, eventId));
+    console.log("Event By ID:", eventById);
+    res.json(eventById);
   } catch (error) {
     if (eventId.length === 0) {
       return res.status(404).json({ error: "Event not found" });
@@ -73,6 +77,7 @@ export const createEvent = async (req, res) => {
     category,
     start_date,
     end_date,
+    start_time,
   } = req.body;
 
   if (!userId) {
@@ -108,10 +113,10 @@ export const createEvent = async (req, res) => {
       description,
       start_date: startDateObj,
       end_date: endDateObj,
-      start_time: startDateObj,
       location,
       image_url,
       category,
+      start_time: startDateObj,
     });
     res.json(event);
   } catch (error) {
@@ -188,10 +193,10 @@ export const updateEvent = async (req, res) => {
     description,
     start_date,
     end_date,
-    start_time,
     location,
     image_url,
     category,
+    start_time,
   } = req.body;
 
   if (start_date && !isValidDateFormat(start_date)) {
@@ -212,6 +217,7 @@ export const updateEvent = async (req, res) => {
       location,
       image_url,
       category,
+      start_time,
     };
 
     if (start_date) {
