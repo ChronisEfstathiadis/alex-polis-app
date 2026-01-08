@@ -15,6 +15,13 @@
       "when": 1766486180069,
       "tag": "0001_lean_prima",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1767860117627,
+      "tag": "0002_typical_multiple_man",
+      "breakpoints": true
     }
   ]
 }

@@ -38,8 +38,9 @@ export const createPointOfInterest = async (req, res) => {
   try {
     const pointOfInterest = await db
       .insert(PointsOfInterest)
-      .values({ name, description, image_url });
-    res.json(pointOfInterest);
+      .values({ name, description, image_url })
+      .returning();
+    res.status(200).json(pointOfInterest[0]);
   } catch (error) {
     if (
       name === undefined ||
@@ -61,7 +62,8 @@ export const updatePointOfInterest = async (req, res) => {
     const pointOfInterest = await db
       .update(PointsOfInterest)
       .set({ name, description, image_url })
-      .where(eq(PointsOfInterest.id, id));
+      .where(eq(PointsOfInterest.id, id))
+      .returning();
     res.json(pointOfInterest);
   } catch (error) {
     if (

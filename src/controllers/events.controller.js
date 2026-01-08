@@ -107,17 +107,20 @@ export const createEvent = async (req, res) => {
   }
 
   try {
-    const event = await db.insert(events).values({
-      user_id: userId,
-      title,
-      description,
-      start_date: startDateObj,
-      end_date: endDateObj,
-      location,
-      image_url,
-      category,
-      start_time: startDateObj,
-    });
+    const event = await db
+      .insert(events)
+      .values({
+        user_id: userId,
+        title,
+        description,
+        start_date: startDateObj,
+        end_date: endDateObj,
+        location,
+        image_url,
+        category,
+        start_time: startDateObj,
+      })
+      .returning();
     res.json(event);
   } catch (error) {
     if (title.length > 100 || title.length < 3) {
@@ -230,7 +233,8 @@ export const updateEvent = async (req, res) => {
     const event = await db
       .update(events)
       .set(updateData)
-      .where(eq(events.id, eventId));
+      .where(eq(events.id, eventId))
+      .returning();
     res.json(event);
   } catch (error) {
     if (title && (title.length > 100 || title.length < 3)) {

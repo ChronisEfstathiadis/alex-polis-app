@@ -45,8 +45,15 @@ export const handleClerkWebhook = async (req, res) => {
         id,
         email,
         username: username,
-        imageUrl: image_url,
+        image_url: image_url,
         role: "user",
+        theme: "light",
+        language: "en",
+        user_type: "local",
+        opt_in_events_push: false,
+        opt_in_events_email: false,
+        onboarding_completed: false,
+        onboarding_step: 0,
       };
 
       await db.insert(users).values(userData).onConflictDoUpdate({
@@ -55,6 +62,20 @@ export const handleClerkWebhook = async (req, res) => {
       });
     } else if (eventType === "user.deleted") {
       await db.delete(users).where(eq(users.id, id));
+    } else if (eventType === "user.updated") {
+      const { email_addresses, username, image_url, primary_email_address_id } =
+        evt.data;
+      const email =
+        email_addresses.find((e) => e.id === primary_email_address_id)
+          ?.email_address ?? email_addresses[0]?.email_address;
+
+      const updateData = {
+        email,
+        username: username,
+        image_url: image_url,
+      };
+
+      await db.update(users).set(updateData).where(eq(users.id, id));
     }
 
     return res.status(200).json({
