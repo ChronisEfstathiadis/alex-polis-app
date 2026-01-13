@@ -19,12 +19,13 @@ export const handleClerkWebhook = async (req, res) => {
   let evt;
 
   try {
-    evt = wh.verify(req.body.toString(), {
+    evt = wh.verify(req.body, {
       "svix-id": svix_id,
       "svix-timestamp": svix_timestamp,
       "svix-signature": svix_signature,
     });
-  } catch {
+  } catch (err) {
+    console.error("Webhook verification failed:", err.message);
     return res.status(400).json({ error: "Verification failed" });
   }
 
