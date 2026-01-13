@@ -32,7 +32,7 @@ export const handleClerkWebhook = async (req, res) => {
   const eventType = evt.type;
 
   try {
-    if (eventType === "user.created" || eventType === "user.updated") {
+    if (eventType === "user.created") {
       const { email_addresses, username, image_url, primary_email_address_id } =
         evt.data;
       const email =
@@ -60,8 +60,6 @@ export const handleClerkWebhook = async (req, res) => {
         target: users.id,
         set: userData,
       });
-    } else if (eventType === "user.deleted") {
-      await db.delete(users).where(eq(users.id, id));
     } else if (eventType === "user.updated") {
       const { email_addresses, username, image_url, primary_email_address_id } =
         evt.data;
@@ -76,6 +74,8 @@ export const handleClerkWebhook = async (req, res) => {
       };
 
       await db.update(users).set(updateData).where(eq(users.id, id));
+    } else if (eventType === "user.deleted") {
+      await db.delete(users).where(eq(users.id, id));
     }
 
     return res.status(200).json({
