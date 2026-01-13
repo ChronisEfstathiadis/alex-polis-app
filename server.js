@@ -7,8 +7,6 @@ import { db } from "./src/db.js";
 import { users } from "./src/models/users.js";
 import { eq } from "drizzle-orm";
 import { handleClerkWebhook } from "./src/webHooks/clerk.js";
-import { specs } from "./src/swagger.js";
-import swaggerUi from "swagger-ui-express";
 import usersRoutes from "./src/routes/users.route.js";
 import eventsRoutes from "./src/routes/events.route.js";
 import pointsOfInterestRoutes from "./src/routes/pointsOfInterest.route.js";
@@ -59,23 +57,6 @@ app.get("/protected", requireAuth(), async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-
-// Change this line:
-// app.use("/swagger", swaggerUi.serve, swaggerUi.setup(specs));
-
-// To this:
-app.use(
-  "/swagger",
-  swaggerUi.serve,
-  swaggerUi.setup(specs, {
-    customCssUrl:
-      "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui.min.css",
-    customJs: [
-      "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-bundle.js",
-      "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-standalone-preset.js",
-    ],
-  })
-);
 
 app.use("/api", usersRoutes);
 app.use("/api", eventsRoutes);
