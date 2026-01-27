@@ -10,6 +10,7 @@ import { handleClerkWebhook } from "./src/webHooks/clerk.js";
 import usersRoutes from "./src/routes/users.route.js";
 import eventsRoutes from "./src/routes/events.route.js";
 import pointsOfInterestRoutes from "./src/routes/pointsOfInterest.route.js";
+import weatherRoutes from "./src/routes/weather.route.js";
 
 dotenv.config();
 
@@ -61,6 +62,7 @@ app.get("/protected", requireAuth(), async (req, res) => {
 app.use("/api", usersRoutes);
 app.use("/api", eventsRoutes);
 app.use("/api", pointsOfInterestRoutes);
+app.use("/api", weatherRoutes);
 app.get("/", (req, res) => {
   res.send("Homepage - <a href='/protected'>Go to Protected Route</a>");
 });
