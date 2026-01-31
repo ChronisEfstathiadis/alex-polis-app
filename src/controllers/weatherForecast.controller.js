@@ -1,4 +1,4 @@
-import { fetchAlexandroupolisWeather } from '../services/Weather.js';
+import { fetchAlexandroupolisWeather } from '../services/WeatherForecast.js';
 
 export const getWeatherForecast = async (req, res) => {
   try {

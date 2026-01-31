@@ -12,7 +12,7 @@ export const fetchWeatherForecast = async (latitude, longitude, days = 7) => {
       
       const response = await axios.get(url, {
         params: {
-          key: process.env.GOOGLE_API_KEY,
+          key: GOOGLE_WEATHER_API_KEY,
           'location.latitude': latitude,
           'location.longitude': longitude,
           days: days
